@@ -1,0 +1,64 @@
+{
+  "name": "averroes-figures",
+  "version": "2.0.0",
+  "description": "مولّدات رسوم SVG تعليمية متقدّمة — مخططات (7 أنواع)، تراكيب تجريبية (7 أنواع)، دوائر كهربائية (تسلسلية+متوازية)، أشكال هندسية (15 شكلاً)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./png": {
+      "types": "./dist/svgToPng.d.ts",
+      "development": "./src/svgToPng.ts",
+      "default": "./dist/svgToPng.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepare": "tsc",
+    "test": "vitest run",
+    "example": "tsx examples/basic-usage.ts"
+  },
+  "keywords": [
+    "svg",
+    "chart",
+    "education",
+    "arabic",
+    "rtl",
+    "physics",
+    "science",
+    "diagram",
+    "lesson",
+    "algeria"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "@resvg/resvg-js": "^2.6.0"
+  },
+  "peerDependenciesMeta": {
+    "@resvg/resvg-js": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
