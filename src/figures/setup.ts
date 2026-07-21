@@ -33,6 +33,7 @@ export const setupKindSchema = z.enum([
   'distillation',  // تقطير
   'decantation',   // تصفية / ديكانتاسيون
   'electrolysis',  // تحليل كهربائي
+  'conductivity',  // اختبار ناقلية محلول (دارة + مصباح + مسريان)
 ]);
 export type SetupKind = z.infer<typeof setupKindSchema>;
 
@@ -524,6 +525,75 @@ function renderElectrolysis(spec: SetupSpec, opts?: RenderOptions): string {
   return wrapSvg(p.join(''), W, H, spec.labels?.substance ?? 'تحليل كهربائي', opts);
 }
 
+// ============================================================
+// conductivity — اختبار ناقلية محلول: كأس محلول + مسريان + مصباح + مولّد + قاطع
+// ============================================================
+// النشاط القياسي في «المحاليل الشاردية والجزيئية»: تُقارَن ناقلية الماء المقطر
+// والمحاليل بملاحظة توهّج المصباح. المصباح مرسوم بلا أشعّة توهّج عمداً — الشكل
+// واحد للحالات الثلاث، والنتيجة يقرّرها المحلول لا الرسم.
+function renderConductivity(spec: SetupSpec, opts?: RenderOptions): string {
+  const c = strokeColor(opts);
+  const substance = spec.labels?.substance?.trim();
+  const solvent = spec.labels?.solvent?.trim();
+  const W = 300, H = 270;
+  const p: string[] = [];
+
+  // ——— الكأس والمحلول ———
+  p.push(
+    `<path d="M 90 112 L 90 226 Q 90 241 105 241 L 195 241 Q 210 241 210 226 L 210 112" ${glassAttr(c)}/>`,
+    glassHighlight(96, 120, 228),
+    `<rect x="92" y="142" width="116" height="97" fill="rgba(100,160,220,0.3)" stroke="none"/>`,
+    liquidSurface(93, 207, 142),
+  );
+
+  // ——— المسريان (قطبان غاطسان في المحلول) ———
+  for (const x of [125, 175]) {
+    p.push(`<line x1="${x}" y1="70" x2="${x}" y2="200" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`);
+  }
+
+  // ——— أسلاك التوصيل: من المسريين إلى الدارة العلوية ———
+  p.push(
+    `<path d="M 125 70 L 125 58 L 50 58 L 50 34" ${strokeAttr(c)}/>`,
+    `<path d="M 175 70 L 175 58 L 250 58 L 250 34" ${strokeAttr(c)}/>`,
+    // السلك العلوي مقطّع لإفساح مواضع القاطع والمولّد والمصباح
+    `<path d="M 50 30 L 74 30" ${strokeAttr(c)}/>`,
+    `<path d="M 104 30 L 138 30" ${strokeAttr(c)}/>`,
+    `<path d="M 162 30 L 197 30" ${strokeAttr(c)}/>`,
+    `<path d="M 223 30 L 250 30" ${strokeAttr(c)}/>`,
+  );
+
+  // ——— القاطع (مغلق) ———
+  p.push(
+    `<circle cx="76" cy="30" r="2.5" ${fillAttr(c)}/>`,
+    `<circle cx="102" cy="30" r="2.5" ${fillAttr(c)}/>`,
+    `<line x1="76" y1="30" x2="103" y2="24" ${strokeAttr(c)}/>`,
+    text(89, 15, 'قاطع', { size: 8 }, opts),
+  );
+
+  // ——— المولّد (خطّان: طويل موجب، قصير سالب) ———
+  p.push(
+    `<line x1="144" y1="18" x2="144" y2="42" ${strokeAttr(c)}/>`,
+    `<line x1="156" y1="24" x2="156" y2="36" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`,
+    text(150, 54, 'مولّد', { size: 8 }, opts),
+  );
+
+  // ——— المصباح (دائرة بصليب) ———
+  p.push(
+    `<circle cx="210" cy="30" r="13" ${strokeAttr(c)}/>`,
+    `<line x1="201" y1="21" x2="219" y2="39" ${strokeThinAttr(c)}/>`,
+    `<line x1="219" y1="21" x2="201" y2="39" ${strokeThinAttr(c)}/>`,
+    text(210, 12, 'مصباح', { size: 8 }, opts),
+  );
+
+  // ——— التسميات ———
+  // تسمية واحدة تحت الكأس: المحلول هو المتغيّر الوحيد بين حالات التجربة.
+  const liquid = substance || solvent;
+  p.push(text(150, 90, 'مسريان', { size: 8 }, opts));
+  if (liquid) p.push(text(150, 258, liquid, { size: 9 }, opts));
+
+  return wrapSvg(p.join(''), W, H, liquid ?? 'اختبار ناقلية محلول', opts);
+}
+
 // ------------------------------------------------------------
 // الموزّع العام للتراكيب التجريبية
 // مبدأ "لا يرمي أبداً" — يُرجع سلسلة فارغة عند أي خطأ.
@@ -545,6 +615,8 @@ export function renderSetup(spec: SetupSpec, opts?: RenderOptions): string {
         return renderDecantation(spec, opts);
       case 'electrolysis':
         return renderElectrolysis(spec, opts);
+      case 'conductivity':
+        return renderConductivity(spec, opts);
       default:
         return '';
     }

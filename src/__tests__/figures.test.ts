@@ -128,7 +128,7 @@ describe('renderChart — المخططات البيانية', () => {
 // التراكيب التجريبية (setup)
 // ============================================================
 describe('renderSetup — التراكيب التجريبية', () => {
-  it('يُنتج SVG لكل الأنواع السبعة', () => {
+  it('يُنتج SVG لكل الأنواع الثمانية', () => {
     const kinds = [
       { kind: 'heating', labels: { substance: 'كبريت' } },
       { kind: 'burning', labels: { substance: 'سكر' } },
@@ -137,6 +137,7 @@ describe('renderSetup — التراكيب التجريبية', () => {
       { kind: 'distillation', labels: { substance: 'ماء مالح', product: 'ماء نقي', temperature: '100°م' } },
       { kind: 'decantation', labels: { substance: 'رمل', solvent: 'ماء' } },
       { kind: 'electrolysis', labels: { substance: 'ماء + ملح', product: 'H₂ + O₂' } },
+      { kind: 'conductivity', labels: { substance: 'محلول كلور الصوديوم', solvent: 'ماء' } },
     ] as const;
     for (const spec of kinds) {
       const svg = renderSetup(spec);
@@ -148,6 +149,16 @@ describe('renderSetup — التراكيب التجريبية', () => {
     expect(renderSetup({ kind: 'heating' }).startsWith('<svg')).toBe(true);
     expect(renderSetup({ kind: 'distillation' }).startsWith('<svg')).toBe(true);
     expect(renderSetup({ kind: 'electrolysis' }).startsWith('<svg')).toBe(true);
+    expect(renderSetup({ kind: 'conductivity' }).startsWith('<svg')).toBe(true);
+  });
+
+  it('ناقلية: يرسم المصباح والمولّد والقاطع والمسريين (لا تحليل كهربائي)', () => {
+    const svg = renderSetup({ kind: 'conductivity', labels: { substance: 'محلول السكر' } });
+    for (const label of ['مصباح', 'مولّد', 'قاطع', 'مسريان', 'محلول السكر']) {
+      expect(svg).toContain(label);
+    }
+    // لا توهّج مرسوم: الشكل واحد للحالات الثلاث (ماء مقطر/سكر/ملح)
+    expect(svg).not.toContain('أنود');
   });
 
   it('يهرب XML في labels.substance (أمان)', () => {
@@ -159,11 +170,13 @@ describe('renderSetup — التراكيب التجريبية', () => {
     expect(setupSpecSchema.safeParse({ kind: 'unknown_kind' }).success).toBe(false);
   });
 
-  it('setupKindSchema يحوي 7 أنواع', () => {
+  it('setupKindSchema يحوي 8 أنواع', () => {
     const parsed = setupKindSchema.safeParse('distillation');
     expect(parsed.success).toBe(true);
     const parsed2 = setupKindSchema.safeParse('electrolysis');
     expect(parsed2.success).toBe(true);
+    const parsed3 = setupKindSchema.safeParse('conductivity');
+    expect(parsed3.success).toBe(true);
   });
 
   it('يدعم خيارات التصيير (dark mode)', () => {
