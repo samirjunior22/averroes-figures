@@ -58,5 +58,9 @@ export type { FunctionPlotSpec, PlotPoint } from './figures/function_plot.js';
 export { renderMolecule, moleculeSpecSchema, moleculeAtomSchema, moleculeBondSchema } from './figures/molecule.js';
 export type { MoleculeSpec, MoleculeAtom, MoleculeBond } from './figures/molecule.js';
 
+// مولّد الأشعة الضوئية (فيزياء / البصريات)
+export { renderRays, raysSpecSchema, raysKindSchema } from './figures/rays.js';
+export type { RaysSpec, RaysKind } from './figures/rays.js';
+
 // الأنواع المشتركة
 export type { RenderOptions } from './figures/shared.js';

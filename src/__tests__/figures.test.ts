@@ -42,8 +42,8 @@ import type { RenderOptions } from '../index.js';
 // الواجهة العامة
 // ============================================================
 describe('الواجهة العامة للحزمة', () => {
-  it('FIGURE_GENS يحوي الأنواع الثمانية', () => {
-    expect(FIGURE_GENS).toEqual(['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule']);
+  it('FIGURE_GENS يحوي الأنواع التسعة', () => {
+    expect(FIGURE_GENS).toEqual(['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays']);
   });
 
   it('renderFigure موزّع عام يكتشف النوع من gen', () => {
