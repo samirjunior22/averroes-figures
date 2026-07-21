@@ -30,7 +30,7 @@ export type { FigureGen, FigureInput } from './figures/registry.js';
 export { renderChart, chartSpecSchema, chartKindSchema } from './figures/chart.js';
 export type { ChartSpec, ChartKind, ChartOptions } from './figures/chart.js';
 
-// مولّد التراكيب التجريبية (heating/burning/filtration/melting/distillation/decantation/electrolysis)
+// مولّد التراكيب التجريبية (heating/burning/filtration/melting/distillation/decantation/electrolysis/conductivity)
 export { renderSetup, setupSpecSchema, setupKindSchema } from './figures/setup.js';
 export type { SetupSpec, SetupKind } from './figures/setup.js';
 
