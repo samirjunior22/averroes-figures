@@ -6,6 +6,8 @@
 //   - تراكيب تجريبية (setup): تسخين، احتراق، فلترة، ذوبان، تقطير، تصفية، تحليل كهربائي
 //   - دوائر كهربائية (circuit): دارات تسلسلية ومتوازية مع تسميات
 //   - أشكال هندسية (geometry): مثلث، مربع، دائرة، خماسي، سداسي، قطع ناقص، زاوية، قطعة مستقيمة
+//   - خطّ زمني (timeline): أحداث مؤرَّخة على محور — للمواد الأدبية (تاريخ)
+//   - خريطة تخطيطية (map): إطار + معالم + نطاقات + مفتاح — للمواد الأدبية (جغرافيا)
 //
 // كل المولّدات تُخرج SVG نصّاً (صفر تبعيات إلزامية عدا zod).
 // تحويل PNG اختياري عبر subpath:  import { svgToPngDataUri } from 'averroes-figures/png'
@@ -61,6 +63,14 @@ export type { MoleculeSpec, MoleculeAtom, MoleculeBond } from './figures/molecul
 // مولّد الأشعة الضوئية (فيزياء / البصريات)
 export { renderRays, raysSpecSchema, raysKindSchema } from './figures/rays.js';
 export type { RaysSpec, RaysKind } from './figures/rays.js';
+
+// مولّد الخطّ الزمني (تاريخ)
+export { renderTimeline, timelineSpecSchema, timelineEventSchema } from './figures/timeline.js';
+export type { TimelineSpec, TimelineEvent } from './figures/timeline.js';
+
+// مولّد الخريطة التخطيطية (جغرافيا)
+export { renderMap, mapSpecSchema, mapMarkerSchema, mapZoneSchema, mapMarkerKindSchema } from './figures/map.js';
+export type { MapSpec, MapMarker, MapZone, MapMarkerKind } from './figures/map.js';
 
 // الأنواع المشتركة
 export type { RenderOptions } from './figures/shared.js';

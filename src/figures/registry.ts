@@ -16,11 +16,13 @@ import { numberLineSpecSchema, renderNumberLine } from './number_line.js';
 import { functionPlotSpecSchema, renderFunctionPlot } from './function_plot.js';
 import { moleculeSpecSchema, renderMolecule } from './molecule.js';
 import { raysSpecSchema, renderRays } from './rays.js';
+import { timelineSpecSchema, renderTimeline } from './timeline.js';
+import { mapSpecSchema, renderMap } from './map.js';
 
 // ------------------------------------------------------------
 // المُوزِّع العام
 // ------------------------------------------------------------
-export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays'] as const;
+export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays', 'timeline', 'map'] as const;
 export type FigureGen = (typeof FIGURE_GENS)[number];
 
 /** مواصفات الشكل حسب المولّد. */
@@ -67,6 +69,14 @@ export function renderFigure(input: FigureInput): string {
     if (input.gen === 'rays') {
       const parsed = raysSpecSchema.safeParse(input.spec);
       return parsed.success ? renderRays(parsed.data) : '';
+    }
+    if (input.gen === 'timeline') {
+      const parsed = timelineSpecSchema.safeParse(input.spec);
+      return parsed.success ? renderTimeline(parsed.data) : '';
+    }
+    if (input.gen === 'map') {
+      const parsed = mapSpecSchema.safeParse(input.spec);
+      return parsed.success ? renderMap(parsed.data) : '';
     }
   } catch {
     // مبدأ "لا يرمي أبداً"
