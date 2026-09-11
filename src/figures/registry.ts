@@ -18,11 +18,12 @@ import { moleculeSpecSchema, renderMolecule } from './molecule.js';
 import { raysSpecSchema, renderRays } from './rays.js';
 import { timelineSpecSchema, renderTimeline } from './timeline.js';
 import { mapSpecSchema, renderMap } from './map.js';
+import { biologySpecSchema, renderBiology } from './biology.js';
 
 // ------------------------------------------------------------
 // المُوزِّع العام
 // ------------------------------------------------------------
-export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays', 'timeline', 'map'] as const;
+export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays', 'timeline', 'map', 'biology'] as const;
 export type FigureGen = (typeof FIGURE_GENS)[number];
 
 /** مواصفات الشكل حسب المولّد. */
@@ -77,6 +78,10 @@ export function renderFigure(input: FigureInput): string {
     if (input.gen === 'map') {
       const parsed = mapSpecSchema.safeParse(input.spec);
       return parsed.success ? renderMap(parsed.data) : '';
+    }
+    if (input.gen === 'biology') {
+      const parsed = biologySpecSchema.safeParse(input.spec);
+      return parsed.success ? renderBiology(parsed.data) : '';
     }
   } catch {
     // مبدأ "لا يرمي أبداً"

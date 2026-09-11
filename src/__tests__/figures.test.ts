@@ -42,10 +42,10 @@ import type { RenderOptions } from '../index.js';
 // الواجهة العامة
 // ============================================================
 describe('الواجهة العامة للحزمة', () => {
-  it('FIGURE_GENS يحوي الأنواع الأحد عشر', () => {
+  it('FIGURE_GENS يحوي الأنواع الاثني عشر', () => {
     expect(FIGURE_GENS).toEqual([
       'circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays',
-      'timeline', 'map',
+      'timeline', 'map', 'biology',
     ]);
   });
 

@@ -72,5 +72,35 @@ export type { TimelineSpec, TimelineEvent } from './figures/timeline.js';
 export { renderMap, mapSpecSchema, mapMarkerSchema, mapZoneSchema, mapMarkerKindSchema } from './figures/map.js';
 export type { MapSpec, MapMarker, MapZone, MapMarkerKind } from './figures/map.js';
 
+// مولّد علوم الطبيعة والحياة (بيولوجيا)
+export {
+  renderBiology,
+  renderNeuron,
+  renderRespiratorySystem,
+  renderEye,
+  biologySpecSchema,
+  biologyKindSchema,
+  neuronSpecSchema,
+  respiratorySpecSchema,
+  eyeSpecSchema,
+  labelsModeSchema,
+  biologyThemeSchema,
+  neuronFocusSchema,
+  respiratoryFocusSchema,
+  eyeFocusSchema,
+} from './figures/biology.js';
+export type {
+  BiologySpec,
+  BiologyKind,
+  NeuronSpec,
+  RespiratorySpec,
+  EyeSpec,
+  LabelsMode,
+  BiologyTheme,
+  NeuronFocus,
+  RespiratoryFocus,
+  EyeFocus,
+} from './figures/biology.js';
+
 // الأنواع المشتركة
 export type { RenderOptions } from './figures/shared.js';
