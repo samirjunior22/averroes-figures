@@ -48,6 +48,29 @@ export type { CircuitSpec, CircuitComponent } from './figures/circuit.js';
 export { renderForces, forcesSpecSchema, forceVectorSchema } from './figures/forces.js';
 export type { ForcesSpec, ForceVector } from './figures/forces.js';
 
+// مولّد الظواهر الميكانيكية (فيزياء التعليم المتوسط - BEM)
+export {
+  renderMechanics,
+  mechanicsSpecSchema,
+  mechanicsKindSchema,
+  mechanicsThemeSchema,
+  twoForcesEquilibriumSpecSchema,
+  threeForcesEquilibriumSpecSchema,
+  archimedesSpecSchema,
+  dynamometerWeightSpecSchema,
+  inclinedPlaneMotionSpecSchema,
+} from './figures/mechanics.js';
+export type {
+  MechanicsSpec,
+  MechanicsKind,
+  MechanicsTheme,
+  TwoForcesEquilibriumSpec,
+  ThreeForcesEquilibriumSpec,
+  ArchimedesSpec,
+  DynamometerWeightSpec,
+  InclinedPlaneMotionSpec,
+} from './figures/mechanics.js';
+
 // مولّد المستقيم المدرّج (رياضيات)
 export { renderNumberLine, numberLineSpecSchema, numberLinePointSchema, numberLineIntervalSchema } from './figures/number_line.js';
 export type { NumberLineSpec, NumberLinePoint, NumberLineInterval } from './figures/number_line.js';
@@ -60,9 +83,9 @@ export type { FunctionPlotSpec, PlotPoint } from './figures/function_plot.js';
 export { renderMolecule, moleculeSpecSchema, moleculeAtomSchema, moleculeBondSchema } from './figures/molecule.js';
 export type { MoleculeSpec, MoleculeAtom, MoleculeBond } from './figures/molecule.js';
 
-// مولّد الأشعة الضوئية (فيزياء / البصريات)
-export { renderRays, raysSpecSchema, raysKindSchema } from './figures/rays.js';
-export type { RaysSpec, RaysKind } from './figures/rays.js';
+// مولّد الأشعة والظواهر الضوئية (فيزياء / البصريات)
+export { renderRays, raysSpecSchema, raysKindSchema, raysThemeSchema } from './figures/rays.js';
+export type { RaysSpec, RaysKind, RaysTheme } from './figures/rays.js';
 
 // مولّد الخطّ الزمني (تاريخ)
 export { renderTimeline, timelineSpecSchema, timelineEventSchema } from './figures/timeline.js';
@@ -78,16 +101,34 @@ export {
   renderNeuron,
   renderRespiratorySystem,
   renderEye,
+  renderVillus,
+  renderSynapse,
+  renderDigestiveSystem,
+  renderUrinarySystem,
+  renderCirculatorySystem,
+  renderSkeletalSystem,
   biologySpecSchema,
   biologyKindSchema,
   neuronSpecSchema,
   respiratorySpecSchema,
   eyeSpecSchema,
+  villusSpecSchema,
+  synapseSpecSchema,
+  digestiveSpecSchema,
+  urinarySpecSchema,
+  circulatorySpecSchema,
+  skeletalSpecSchema,
   labelsModeSchema,
   biologyThemeSchema,
   neuronFocusSchema,
   respiratoryFocusSchema,
   eyeFocusSchema,
+  villusFocusSchema,
+  synapseFocusSchema,
+  digestiveFocusSchema,
+  urinaryFocusSchema,
+  circulatoryFocusSchema,
+  skeletalFocusSchema,
 } from './figures/biology.js';
 export type {
   BiologySpec,
@@ -95,12 +136,90 @@ export type {
   NeuronSpec,
   RespiratorySpec,
   EyeSpec,
+  VillusSpec,
+  SynapseSpec,
+  DigestiveSpec,
+  UrinarySpec,
+  CirculatorySpec,
+  SkeletalSpec,
   LabelsMode,
   BiologyTheme,
   NeuronFocus,
   RespiratoryFocus,
   EyeFocus,
+  VillusFocus,
+  SynapseFocus,
+  DigestiveFocus,
+  UrinaryFocus,
+  CirculatoryFocus,
+  SkeletalFocus,
 } from './figures/biology.js';
+
+// مولّد الإعلام الآلي والمعلوماتية
+export {
+  renderInformatics,
+  renderComputerHardware,
+  renderNetworkTopology,
+  renderOsInterface,
+  renderScratch,
+  informaticsSpecSchema,
+  informaticsKindSchema,
+  informaticsThemeSchema,
+  computerHardwareSpecSchema,
+  hardwareViewSchema,
+  hardwareFocusSchema,
+  networkTopologySpecSchema,
+  networkTopologyTypeSchema,
+  osInterfaceSpecSchema,
+  osComponentSchema,
+  scratchSpecSchema,
+  scratchViewSchema,
+} from './figures/informatics.js';
+export type {
+  InformaticsSpec,
+  InformaticsKind,
+  InformaticsTheme,
+  ComputerHardwareSpec,
+  NetworkTopologySpec,
+  OsInterfaceSpec,
+  ScratchSpec,
+} from './figures/informatics.js';
+
+// مولّد العلوم الفيزيائية والتكنولوجيا (الظواهر الكهربائية)
+export {
+  renderPhysics,
+  renderElectrostatics,
+  renderInduction,
+  renderOscilloscope,
+  renderElectricalSafety,
+  renderCircuit3D,
+  physicsSpecSchema,
+  physicsKindSchema,
+  physicsThemeSchema,
+  electrostaticsSpecSchema,
+  electrostaticsApparatusSchema,
+  chargeTypeSchema,
+  chargingMethodSchema,
+  inductionSpecSchema,
+  magnetMovementSchema,
+  oscilloscopeSpecSchema,
+  oscilloscopeSignalSchema,
+  electricalSafetySpecSchema,
+  safetyScenarioSchema,
+  circuit3dSpecSchema,
+  switchStateSchema,
+  circuitTypeSchema,
+} from './figures/physics.js';
+export type {
+  PhysicsSpec,
+  PhysicsKind,
+  PhysicsTheme,
+  ElectrostaticsSpec,
+  InductionSpec,
+  OscilloscopeSpec,
+  ElectricalSafetySpec,
+  Circuit3dSpec,
+} from './figures/physics.js';
 
 // الأنواع المشتركة
 export type { RenderOptions } from './figures/shared.js';

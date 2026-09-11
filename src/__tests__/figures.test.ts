@@ -42,10 +42,10 @@ import type { RenderOptions } from '../index.js';
 // الواجهة العامة
 // ============================================================
 describe('الواجهة العامة للحزمة', () => {
-  it('FIGURE_GENS يحوي الأنواع الاثني عشر', () => {
+  it('FIGURE_GENS يحوي الأنواع الأربعة عشر', () => {
     expect(FIGURE_GENS).toEqual([
       'circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays',
-      'timeline', 'map', 'biology',
+      'timeline', 'map', 'biology', 'informatics', 'physics',
     ]);
   });
 
@@ -55,11 +55,15 @@ describe('الواجهة العامة للحزمة', () => {
     const geo = renderFigure({ gen: 'geometry', spec: { shape: 'triangle' } });
     const circ = renderFigure({ gen: 'circuit', spec: { components: ['generator', 'lamp'] } });
     const forces = renderFigure({ gen: 'forces', spec: { body: 'box', vectors: [{ dir: 'down', label: 'P', mag: 10 }] } });
+    const info = renderFigure({ gen: 'informatics', spec: { kind: 'computer_hardware' } });
+    const phy = renderFigure({ gen: 'physics', spec: { kind: 'electrostatics' } });
     expect(chart.startsWith('<svg')).toBe(true);
     expect(setup.startsWith('<svg')).toBe(true);
     expect(geo.startsWith('<svg')).toBe(true);
     expect(circ.startsWith('<svg')).toBe(true);
     expect(forces.startsWith('<svg')).toBe(true);
+    expect(info.startsWith('<svg')).toBe(true);
+    expect(phy.startsWith('<svg')).toBe(true);
   });
 });
 

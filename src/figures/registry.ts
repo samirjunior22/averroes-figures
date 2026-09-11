@@ -19,11 +19,14 @@ import { raysSpecSchema, renderRays } from './rays.js';
 import { timelineSpecSchema, renderTimeline } from './timeline.js';
 import { mapSpecSchema, renderMap } from './map.js';
 import { biologySpecSchema, renderBiology } from './biology.js';
+import { informaticsSpecSchema, renderInformatics } from './informatics.js';
+import { physicsSpecSchema, renderPhysics } from './physics.js';
+import { mechanicsSpecSchema, renderMechanics } from './mechanics.js';
 
 // ------------------------------------------------------------
 // المُوزِّع العام
 // ------------------------------------------------------------
-export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays', 'timeline', 'map', 'biology'] as const;
+export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays', 'timeline', 'map', 'biology', 'informatics', 'physics'] as const;
 export type FigureGen = (typeof FIGURE_GENS)[number];
 
 /** مواصفات الشكل حسب المولّد. */
@@ -53,7 +56,10 @@ export function renderFigure(input: FigureInput): string {
     }
     if (input.gen === 'forces') {
       const parsed = forcesSpecSchema.safeParse(input.spec);
-      return parsed.success ? renderForces(parsed.data) : '';
+      if (parsed.success) return renderForces(parsed.data);
+      const parsedMech = mechanicsSpecSchema.safeParse(input.spec);
+      if (parsedMech.success) return renderMechanics(parsedMech.data);
+      return '';
     }
     if (input.gen === 'number_line') {
       const parsed = numberLineSpecSchema.safeParse(input.spec);
@@ -82,6 +88,14 @@ export function renderFigure(input: FigureInput): string {
     if (input.gen === 'biology') {
       const parsed = biologySpecSchema.safeParse(input.spec);
       return parsed.success ? renderBiology(parsed.data) : '';
+    }
+    if (input.gen === 'informatics') {
+      const parsed = informaticsSpecSchema.safeParse(input.spec);
+      return parsed.success ? renderInformatics(parsed.data) : '';
+    }
+    if (input.gen === 'physics') {
+      const parsed = physicsSpecSchema.safeParse(input.spec);
+      return parsed.success ? renderPhysics(parsed.data) : '';
     }
   } catch {
     // مبدأ "لا يرمي أبداً"

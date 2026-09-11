@@ -18,6 +18,7 @@ import {
   strokeThinAttr,
   fillAttr,
 } from './shared.js';
+import { renderMechanics } from './mechanics.js';
 
 // ------------------------------------------------------------
 // مخطّطات Zod
@@ -200,16 +201,26 @@ function labelSideForDir(dir: string | number): 'above' | 'below' | 'left' | 'ri
 // رسم الأجسام
 // ------------------------------------------------------------
 
-/** يرسم صندوقاً في المركز. */
+/** يرسم صندوقاً في المركز بتجسيم 2.5D خفيف. */
 function drawBox(cx: number, cy: number, size: number, color: string): string {
   const x = cx - size / 2;
   const y = cy - size / 2;
-  return `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="4" ${strokeAttr(color)} />`;
+  return `
+    <rect x="${x}" y="${y + 2}" width="${size}" height="${size}" rx="4" fill="rgba(0,0,0,0.12)"/>
+    <rect x="${x}" y="${y}" width="${size}" height="${size}" rx="4" fill="#f8fafc" ${strokeAttr(color)} />
+    <rect x="${x + 3}" y="${y + 3}" width="${size - 6}" height="${size - 6}" rx="2" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="3" fill="${color}"/>
+    <text x="${cx + 8}" y="${cy - 6}" font-size="10" font-weight="bold" fill="${color}">G</text>`;
 }
 
-/** يرسم كرة في المركز. */
+/** يرسم كرة في المركز بتجسيم 2.5D خفيف. */
 function drawBall(cx: number, cy: number, r: number, color: string): string {
-  return `<circle cx="${cx}" cy="${cy}" r="${r}" ${strokeAttr(color)} />`;
+  return `
+    <ellipse cx="${cx}" cy="${cy + r + 2}" rx="${r * 0.8}" ry="4" fill="rgba(0,0,0,0.15)"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="#f1f5f9" ${strokeAttr(color)} />
+    <circle cx="${cx - r * 0.3}" cy="${cy - r * 0.3}" r="${r * 0.3}" fill="#ffffff" opacity="0.6"/>
+    <circle cx="${cx}" cy="${cy}" r="3" fill="${color}"/>
+    <text x="${cx + 8}" y="${cy - 6}" font-size="10" font-weight="bold" fill="${color}">G</text>`;
 }
 
 /** يرسم مستوى مائلاً مع جسم صندوق عليه. */
@@ -259,9 +270,16 @@ function drawIncline(cx: number, cy: number, angleDeg: number, color: string): s
 // المُصيّر الرئيسي
 // ------------------------------------------------------------
 
-/** يُصيّر مخطط القوى إلى SVG. spec غير صالح → ''. */
-export function renderForces(spec: ForcesSpec, opts?: RenderOptions): string {
+/** يُصيّر مخطط القوى إلى SVG. يدعم المواصفات القديمة ومواصفات الميكانيك. */
+export function renderForces(spec: ForcesSpec | any, opts?: RenderOptions): string {
   try {
+    if (spec && typeof spec === 'object' && 'kind' in spec) {
+      return renderMechanics(spec, opts);
+    }
+    const parsed = forcesSpecSchema.safeParse(spec);
+    if (!parsed.success) return '';
+    const validSpec = parsed.data;
+
     const col = resolveColor(opts);
 
     // المركز
@@ -271,7 +289,7 @@ export function renderForces(spec: ForcesSpec, opts?: RenderOptions): string {
     let svg = '';
 
     // رسم الجسم
-    switch (spec.body) {
+    switch (validSpec.body) {
       case 'box':
         svg += drawBox(cx, cy, BOX_SIZE, col);
         break;
@@ -279,22 +297,21 @@ export function renderForces(spec: ForcesSpec, opts?: RenderOptions): string {
         svg += drawBall(cx, cy, BALL_R, col);
         break;
       case 'incline': {
-        const angle = spec.angle ?? 30;
+        const angle = validSpec.angle ?? 30;
         svg += drawIncline(cx, cy - 10, angle, col);
-        // نقطة تثبيت القوى (وسط الجسم على المائل)
         break;
       }
     }
 
     // حساب أقصى مقدار لتوحيد الأطوال
-    const maxMag = Math.max(...spec.vectors.map((v) => v.mag ?? 1));
+    const maxMag = Math.max(...validSpec.vectors.map((v) => v.mag ?? 1));
     const scale = BASE_ARROW / maxMag;
 
     // رسم متجهات القوى
     const originX = cx;
     const originY = cy;
 
-    for (const v of spec.vectors) {
+    for (const v of validSpec.vectors) {
       const angle = dirToAngle(v.dir);
       const length = (v.mag ?? 1) * scale;
       const fColor = forceColor(v.dir);
@@ -304,8 +321,8 @@ export function renderForces(spec: ForcesSpec, opts?: RenderOptions): string {
     }
 
     // ARIA label
-    const bodyName = spec.body === 'box' ? 'صندوق' : spec.body === 'ball' ? 'كرة' : 'مستوى مائل';
-    const ariaLabel = `مخطط قوى: ${bodyName} مع ${spec.vectors.length} قوى`;
+    const bodyName = validSpec.body === 'box' ? 'صندوق' : validSpec.body === 'ball' ? 'كرة' : 'مستوى مائل';
+    const ariaLabel = `مخطط قوى: ${bodyName} مع ${validSpec.vectors.length} قوى`;
 
     return wrapSvg(svg, W, H, ariaLabel, opts);
   } catch {
