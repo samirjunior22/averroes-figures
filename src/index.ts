@@ -107,6 +107,10 @@ export {
   renderUrinarySystem,
   renderCirculatorySystem,
   renderSkeletalSystem,
+  renderAbsorptionPathways,
+  renderBloodSmear,
+  renderEnzymaticDigestion,
+  renderCellularRespiration,
   biologySpecSchema,
   biologyKindSchema,
   neuronSpecSchema,
@@ -118,6 +122,10 @@ export {
   urinarySpecSchema,
   circulatorySpecSchema,
   skeletalSpecSchema,
+  absorptionPathwaysSpecSchema,
+  bloodSmearSpecSchema,
+  enzymaticDigestionSpecSchema,
+  cellularRespirationSpecSchema,
   labelsModeSchema,
   biologyThemeSchema,
   neuronFocusSchema,
@@ -142,6 +150,10 @@ export type {
   UrinarySpec,
   CirculatorySpec,
   SkeletalSpec,
+  AbsorptionPathwaysSpec,
+  BloodSmearSpec,
+  EnzymaticDigestionSpec,
+  CellularRespirationSpec,
   LabelsMode,
   BiologyTheme,
   NeuronFocus,
@@ -223,3 +235,8 @@ export type {
 
 // الأنواع المشتركة
 export type { RenderOptions } from './figures/shared.js';
+
+// مولّد كائنات المخبر للسبورة (gen: 'lab') — بطارية/مقاومة/قاطعة/مقياس/متّجه/موجة/ذرّة/زجاجيات/خلية…
+// + الفهرس LAB_CATALOG الذي تشتقّ منه واجهة السبورة الأزرار وحقول التخصيص
+export { renderLab, labSpecSchema, labKindSchema, LAB_KINDS, LAB_CATALOG, labCatalogEntry, ELEMENTS, elementByZ, elementBySymbol, shellDistribution } from './figures/lab/index.js';
+export type { LabSpec, LabKind, LabCatalogEntry, LabField, LabFieldOption, LabPreset, LabSubject, ElementInfo } from './figures/lab/index.js';

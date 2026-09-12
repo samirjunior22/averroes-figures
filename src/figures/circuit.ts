@@ -48,6 +48,10 @@ export const circuitSpecSchema = z.object({
   labels: z.array(z.string().max(8)).max(10).optional(),
   /** في الدارات المتوازية: مكوّنات الفرع الثاني (الفروع الأولى في components). */
   branch2: z.array(circuitComponentSchema).max(8).optional(),
+  /** قيم اختيارية تُعرض تحت تسمية كل مكوّن بالترتيب (مثل ['12V', '', '10Ω']). */
+  values: z.array(z.string().max(12)).max(10).optional(),
+  /** حالة القاطع: true = مغلق (ذراع على السلك)، الافتراضي مفتوح. */
+  switchClosed: z.boolean().optional(),
 }).strict();
 export type CircuitSpec = z.infer<typeof circuitSpecSchema>;
 
@@ -78,6 +82,7 @@ function hSymbol(
   y: number,
   col: string,
   font: string,
+  switchClosed = false,
 ): { hw: number; svg: string } {
   const s = strokeAttr(col);
   const f = fillAttr(col);
@@ -100,7 +105,9 @@ function hSymbol(
         svg:
           `<circle cx="${cx - 12}" cy="${y}" r="2" ${f}/>` +
           `<circle cx="${cx + 12}" cy="${y}" r="2" ${f}/>` +
-          `<line x1="${cx - 12}" y1="${y}" x2="${cx + 10}" y2="${y - 11}" ${s}/>`,
+          (switchClosed
+            ? `<line x1="${cx - 12}" y1="${y}" x2="${cx + 12}" y2="${y}" ${s}/>`
+            : `<line x1="${cx - 12}" y1="${y}" x2="${cx + 10}" y2="${y - 11}" ${s}/>`),
       };
 
     // --- مقاومة: مستطيل ---
@@ -192,7 +199,7 @@ function vSource(x: number, cy: number, col: string): string {
 }
 
 /** رمز قاطع على حافة عمودية (ذراع مفتوح بين نقطتيّ توصيل). */
-function vSwitch(x: number, y1: number, y2: number, col: string): string {
+function vSwitch(x: number, y1: number, y2: number, col: string, closed = false): string {
   const s = strokeAttr(col);
   const f = fillAttr(col);
   const mid = (y1 + y2) / 2;
@@ -201,7 +208,9 @@ function vSwitch(x: number, y1: number, y2: number, col: string): string {
     `<line x1="${x}" y1="${y1}" x2="${x}" y2="${mid - g}" ${s}/>` +
     `<circle cx="${x}" cy="${mid - g}" r="2" ${f}/>` +
     `<circle cx="${x}" cy="${mid + g}" r="2" ${f}/>` +
-    `<line x1="${x}" y1="${mid - g}" x2="${x + 11}" y2="${mid + g - 2}" ${s}/>` +
+    (closed
+      ? `<line x1="${x}" y1="${mid - g}" x2="${x}" y2="${mid + g}" ${s}/>`
+      : `<line x1="${x}" y1="${mid - g}" x2="${x + 11}" y2="${mid + g - 2}" ${s}/>`) +
     `<line x1="${x}" y1="${mid + g}" x2="${x}" y2="${y2}" ${s}/>`
   );
 }
@@ -232,6 +241,24 @@ function currentArrow(
 // بناء فرع أفقي مع مكوّنات وتسميات
 // ------------------------------------------------------------
 
+/** لون القيم (12V، 10Ω…) — مميَّز عن التسميات ليُقرأ كقراءة لا كاسم. */
+const VALUE_COLOR = '#2563eb';
+
+/** تسمية مكوّن (سطر أوّل) وقيمته (سطر ثانٍ) تحت الموضع (cx, y). */
+function compCaption(
+  cx: number,
+  y: number,
+  label: string | undefined,
+  value: string | undefined,
+  col: string,
+  font: string,
+): string {
+  let out = '';
+  if (label) out += text(cx, y, label, { size: 10, color: col, fontFamily: font });
+  if (value) out += text(cx, y + 11, value, { size: 9, color: VALUE_COLOR, fontFamily: font, bold: true });
+  return out;
+}
+
 /**
  * يوزّع المكوّنات على سلك أفقي من xStart إلى xEnd
  * ويعيد SVG السلك والرموز والتسميات.
@@ -244,6 +271,8 @@ function buildBranch(
   col: string,
   font: string,
   labels: string[] | undefined,
+  values?: string[],
+  switchClosed = false,
 ): string {
   const s = strokeAttr(col);
   const parts: string[] = [];
@@ -270,7 +299,7 @@ function buildBranch(
   for (let i = 0; i < n; i++) {
     const { comp, labelIdx } = items[i]!;
     const cx = positions[i]!;
-    const { hw, svg } = hSymbol(comp, cx, y, col, font);
+    const { hw, svg } = hSymbol(comp, cx, y, col, font, switchClosed);
 
     // سلك قبل الرمز (يُتجنَّب الخطوط ذات الطول صفر)
     if (cx - hw > cursor + 0.5) {
@@ -282,20 +311,9 @@ function buildBranch(
     // رسم الرمز
     if (svg) parts.push(svg);
 
-    // التسمية أسفل الرمز
-    if (
-      labels &&
-      labelIdx !== undefined &&
-      labelIdx < labels.length &&
-      labels[labelIdx]
-    ) {
-      parts.push(
-        text(cx, y + 20, labels[labelIdx]!, {
-          size: 10,
-          color: col,
-          fontFamily: font,
-        }),
-      );
+    // التسمية والقيمة أسفل الرمز
+    if (labelIdx !== undefined) {
+      parts.push(compCaption(cx, y + 20, labels?.[labelIdx], values?.[labelIdx], col, font));
     }
 
     cursor = cx + hw;
@@ -332,6 +350,7 @@ function renderSeries(
 
   const comps = spec.components;
   const labels = spec.labels;
+  const values = spec.values;
 
   // أوّل مصدر (مولّد أو بطارية) يوضع على الحافة اليسرى
   const srcIdx = comps.findIndex((c) => SRC_TYPES.has(c));
@@ -347,23 +366,15 @@ function renderSeries(
   const parts: string[] = [];
 
   // --- السلك العلوي مع المكوّنات ---
-  parts.push(buildBranch(topItems, yT, xL, xR, col, font, labels));
+  parts.push(buildBranch(topItems, yT, xL, xR, col, font, labels, values, spec.switchClosed));
 
   // --- الحافة اليسرى (المصدر أو سلك مستقيم) ---
   if (hasSource) {
     parts.push(`<line x1="${xL}" y1="${yT}" x2="${xL}" y2="${cyMid - 9}" ${s}/>`);
     parts.push(vSource(xL, cyMid, col));
     parts.push(`<line x1="${xL}" y1="${cyMid + 9}" x2="${xL}" y2="${yB}" ${s}/>`);
-    // تسمية المصدر
-    if (labels && srcIdx < labels.length && labels[srcIdx]) {
-      parts.push(
-        text(xL, yB + 18, labels[srcIdx]!, {
-          size: 10,
-          color: col,
-          fontFamily: font,
-        }),
-      );
-    }
+    // تسمية المصدر وقيمته
+    parts.push(compCaption(xL, yB + 18, labels?.[srcIdx], values?.[srcIdx], col, font));
   } else {
     parts.push(`<line x1="${xL}" y1="${yT}" x2="${xL}" y2="${yB}" ${s}/>`);
   }
@@ -410,6 +421,7 @@ function renderParallel(
   const comps = spec.components;
   const b2 = spec.branch2 ?? [];
   const labels = spec.labels;
+  const values = spec.values;
 
   // --- فهرسة المصدر والقاطع في كلا الفرعين ---
   const srcIdx1 = comps.findIndex((c) => SRC_TYPES.has(c));
@@ -419,22 +431,26 @@ function renderParallel(
 
   // --- استخراج المصدر (الأولوية: components ثم branch2) ---
   let srcLabel: string | undefined;
+  let srcValue: string | undefined;
   let hasSrc = false;
 
   if (srcIdx1 !== -1) {
     hasSrc = true;
     srcLabel = labels?.[srcIdx1];
+    srcValue = values?.[srcIdx1];
   } else if (srcIdx2 !== -1) {
     hasSrc = true;
   }
 
   // --- استخراج القاطع (الأولوية: components ثم branch2) ---
   let swLabel: string | undefined;
+  let swValue: string | undefined;
   let hasSw = false;
 
   if (swIdx1 !== -1) {
     hasSw = true;
     swLabel = labels?.[swIdx1];
+    swValue = values?.[swIdx1];
   } else if (swIdx2 !== -1) {
     hasSw = true;
   }
@@ -460,31 +476,15 @@ function renderParallel(
     parts.push(`<line x1="${xL}" y1="${yTop}" x2="${xL}" y2="${cyMid - 9}" ${s}/>`);
     parts.push(vSource(xL, cyMid, col));
     parts.push(`<line x1="${xL}" y1="${cyMid + 9}" x2="${xL}" y2="${yBot}" ${s}/>`);
-    if (srcLabel) {
-      parts.push(
-        text(xL, yBot + 18, srcLabel, {
-          size: 10,
-          color: col,
-          fontFamily: font,
-        }),
-      );
-    }
+    parts.push(compCaption(xL, yBot + 18, srcLabel, srcValue, col, font));
   } else {
     parts.push(`<line x1="${xL}" y1="${yTop}" x2="${xL}" y2="${yBot}" ${s}/>`);
   }
 
   // --- الحافة اليمنى مع القاطع ---
   if (hasSw) {
-    parts.push(vSwitch(xR, yTop, yBot, col));
-    if (swLabel) {
-      parts.push(
-        text(xR, yBot + 18, swLabel, {
-          size: 10,
-          color: col,
-          fontFamily: font,
-        }),
-      );
-    }
+    parts.push(vSwitch(xR, yTop, yBot, col, spec.switchClosed ?? false));
+    parts.push(compCaption(xR, yBot + 18, swLabel, swValue, col, font));
   } else {
     parts.push(`<line x1="${xR}" y1="${yTop}" x2="${xR}" y2="${yBot}" ${s}/>`);
   }
@@ -502,7 +502,7 @@ function renderParallel(
   parts.push(`<line x1="${jR}" y1="${yTop}" x2="${jR}" y2="${yBot}" ${s}/>`);
 
   // --- الفرع الأوّل مع المكوّنات ---
-  parts.push(buildBranch(branch1, yTop, jL, jR, col, font, labels));
+  parts.push(buildBranch(branch1, yTop, jL, jR, col, font, labels, values, spec.switchClosed));
 
   // --- الفرع الثاني مع المكوّنات (بلا تسميات مخصّصة) ---
   parts.push(buildBranch(branch2Items, yBot, jL, jR, col, font, undefined));

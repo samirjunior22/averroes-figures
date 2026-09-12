@@ -42,10 +42,10 @@ import type { RenderOptions } from '../index.js';
 // الواجهة العامة
 // ============================================================
 describe('الواجهة العامة للحزمة', () => {
-  it('FIGURE_GENS يحوي الأنواع الأربعة عشر', () => {
+  it('FIGURE_GENS يحوي الأنواع الخمسة عشر', () => {
     expect(FIGURE_GENS).toEqual([
       'circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays',
-      'timeline', 'map', 'biology', 'informatics', 'physics',
+      'timeline', 'map', 'biology', 'informatics', 'physics', 'lab',
     ]);
   });
 
@@ -258,6 +258,18 @@ describe('renderGeometry — الأشكال الهندسية', () => {
 // الدارات الكهربائية (circuit)
 // ============================================================
 describe('renderCircuit — الدارات الكهربائية', () => {
+  it('values تُعرض تحت التسميات، وswitchClosed يُغلق ذراع القاطع', () => {
+    const open = renderCircuit({ layout: 'series', components: ['generator', 'switch', 'resistor'], labels: ['E', 'K', 'R'], values: ['12V', '', '10Ω'] });
+    expect(open).toContain('12V');
+    expect(open).toContain('10Ω');
+    const closed = renderCircuit({ layout: 'series', components: ['generator', 'switch', 'resistor'], switchClosed: true });
+    expect(closed).not.toEqual(renderCircuit({ layout: 'series', components: ['generator', 'switch', 'resistor'] }));
+    const par = renderCircuit({ layout: 'parallel', components: ['generator', 'switch', 'lamp'], branch2: ['lamp'], labels: ['E', 'K'], values: ['4.5V', 'مغلقة'], switchClosed: true });
+    expect(par).toContain('4.5V');
+    expect(par).toContain('مغلقة');
+    expect(circuitSpecSchema.safeParse({ components: ['lamp'], values: ['x'.repeat(13)] }).success).toBe(false);
+  });
+
   it('يُنتج SVG لدارة بسيطة', () => {
     const svg = renderCircuit({ components: ['generator', 'switch', 'lamp'] });
     expect(svg.startsWith('<svg')).toBe(true);

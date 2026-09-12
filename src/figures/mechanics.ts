@@ -1218,8 +1218,7 @@ export function renderMechanics(spec: MechanicsSpec, opts?: RenderOptions): stri
 
     let svgBody = renderDefs(palette);
 
-    // خلفية المشهد
-    svgBody += `<rect width="${W}" height="${H}" rx="12" fill="url(#mech-bg-grad)"/>`;
+    // خلفية المشهد (شفافة بدون مستطيل مصمت لسهولة الدمج والطباعة)
 
     // توجيه الرسم حسب النموذج
     switch (validSpec.kind) {

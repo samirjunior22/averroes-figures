@@ -13,6 +13,22 @@
 import { z } from 'zod';
 import type { RenderOptions } from './shared.js';
 import { esc, wrapSvg } from './shared.js';
+import {
+  absorptionPathwaysSpecSchema,
+  renderAbsorptionPathways,
+  bloodSmearSpecSchema,
+  renderBloodSmear,
+  enzymaticDigestionSpecSchema,
+  renderEnzymaticDigestion,
+  cellularRespirationSpecSchema,
+  renderCellularRespiration,
+} from './biologyNutrition.js';
+import type {
+  AbsorptionPathwaysSpec,
+  BloodSmearSpec,
+  EnzymaticDigestionSpec,
+  CellularRespirationSpec,
+} from './biologyNutrition.js';
 
 // ------------------------------------------------------------
 // مخطّطات Zod
@@ -28,6 +44,10 @@ export const biologyKindSchema = z.enum([
   'urinary_system',     // الجهاز البولي والإطراح وتصفية الدم
   'circulatory_system', // الجهاز الدوراني والقلب والدورتان الدمويتان
   'skeletal_system',    // الهيكل العظمي العام والمفاصل
+  'absorption_pathways', // طريقا الامتصاص ونقل المغذيات وتعديل السكر
+  'blood_smear',         // السحبة الدموية وخلايا الوسط الداخلي
+  'enzymatic_digestion', // الهضم الأنزيمي للنشا وتجارب الكواشف
+  'cellular_respiration', // التنفس الخلوي واستعمال المغذيات والطاقة
 ]);
 export type BiologyKind = z.infer<typeof biologyKindSchema>;
 
@@ -340,6 +360,10 @@ export const biologySpecSchema = z.discriminatedUnion('kind', [
   urinarySpecSchema,
   circulatorySpecSchema,
   skeletalSpecSchema,
+  absorptionPathwaysSpecSchema,
+  bloodSmearSpecSchema,
+  enzymaticDigestionSpecSchema,
+  cellularRespirationSpecSchema,
 ]);
 export type BiologySpec = z.infer<typeof biologySpecSchema>;
 
@@ -3217,9 +3241,39 @@ export function renderBiology(spec: BiologySpec, opts?: RenderOptions): string {
     if (spec.kind === 'skeletal_system') {
       return renderSkeletalSystem(spec, opts);
     }
+    if (spec.kind === 'absorption_pathways') {
+      return renderAbsorptionPathways(spec, opts);
+    }
+    if (spec.kind === 'blood_smear') {
+      return renderBloodSmear(spec, opts);
+    }
+    if (spec.kind === 'enzymatic_digestion') {
+      return renderEnzymaticDigestion(spec, opts);
+    }
+    if (spec.kind === 'cellular_respiration') {
+      return renderCellularRespiration(spec, opts);
+    }
   } catch {
     // مبدأ "لا يرمي أبداً"
   }
   return '';
 }
+
+export {
+  renderAbsorptionPathways,
+  renderBloodSmear,
+  renderEnzymaticDigestion,
+  renderCellularRespiration,
+  absorptionPathwaysSpecSchema,
+  bloodSmearSpecSchema,
+  enzymaticDigestionSpecSchema,
+  cellularRespirationSpecSchema,
+};
+export type {
+  AbsorptionPathwaysSpec,
+  BloodSmearSpec,
+  EnzymaticDigestionSpec,
+  CellularRespirationSpec,
+};
+
 

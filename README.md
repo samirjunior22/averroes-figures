@@ -12,7 +12,7 @@
 
 ### المميزات
 
-- 🎨 **4 مولّدات**: مخططات (chart)، تراكيب تجريبية (setup)، دوائر كهربائية (circuit)، أشكال هندسية (geometry)
+- 🎨 **15 مولّداً**: مخططات، تراكيب تجريبية، دوائر، أشكال هندسية، محور أعداد، دوال، جزيئات، أشعّة، خطّ زمني، خريطة، بيولوجيا، إعلام آلي، فيزياء، ميكانيك، و**كائنات المخبر** (`lab`) للسبورة الذكية
 - 📐 **SVG أصلي**: كل المخرجات SVG نصّي قابل للتنسيق بـ CSS
 - 🌐 **دعم RTL**: التسميات العربية تُعرض بشكل صحيح
 - 🛡️ **مبدأ "لا يرمي"**: أي spec غير صالح → نص فارغ (لا يكسر برنامجك)
@@ -115,6 +115,34 @@ const dataUri = svgToPngDataUri(svgString, { width: 480 });
 #### الدارات الكهربائية (circuit)
 
 مكوّنات: `generator` · `battery` · `lamp` · `switch` · `resistor` · `ammeter` · `voltmeter` · `motor` · `wire`
+
+### كائنات المخبر للسبورة الذكية (`gen: 'lab'`)
+
+كائنات **مفردة** يركّبها الأستاذ بحرّية على السبورة، بأسلوب ثلاثي الأبعاد ناعم وقيم حيّة
+تُعرض على الكائن نفسه (`E = 12 V` · `R = 10 Ω` · `1.2 A`) — بخلاف مشاهد `physics`/`biology`
+الكاملة (960×540). 28 نوعاً موزّعة على ثلاث موادّ:
+
+| المادة | الأنواع |
+|---|---|
+| فيزياء | `battery` `resistor` `switch` `lamp` `meter` `wire` `body` `vector` `charged_sphere` `wave` |
+| كيمياء | `atom` `element_card` `formula` `bond` `glassware` `burner` `heating` `thermometer` `balance` `funnel` `filter_paper` |
+| علوم طبيعية | `cell` `microscope` `petri_dish` `magnifier` `plant` `seed` `leaf` |
+
+```typescript
+import { renderLab, LAB_CATALOG } from 'averroes-figures';
+
+// ذرّة رذرفورد: p⁺ / n⁰ / e⁻ وتوزيع الطبقات K,L,M يُحسب من Z وA، والاسم من جدول العناصر
+renderLab({ kind: 'atom', Z: 11, A: 23 });
+renderLab({ kind: 'battery', voltage: 12 });
+renderLab({ kind: 'glassware', shape: 'erlenmeyer', level: 40, color: '#4ade80' });
+```
+
+- **`LAB_CATALOG`** هو مصدر الحقيقة الوحيد للواجهة: لكل `kind` مادّته وتسمياته (ar/fr)
+  و**حقول التخصيص** (`number`/`text`/`select`/`boolean`) و**الأشكال الجاهزة** (~46).
+  واجهة السبورة تشتقّ منه أزرار الإدراج ولوحة التخصيص — لا قوائم موازية في العميل.
+- المخطّطات كلّها `.strict()` وحقولها `.optional()` بلا `.default()` (الافتراضات في الرسم).
+- كل تصيير يحمل معرّفات `<defs>` فريدة (`uid`) — كائنات كثيرة في صفحة واحدة لا تختلط
+  تدرّجاتها. والنصوص مثبَّتة `direction="ltr"` كي لا تقلب صفحة RTL «12 V» إلى «V 12».
 
 ### التحقق من المواصفات (Zod)
 

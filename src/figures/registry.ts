@@ -22,11 +22,12 @@ import { biologySpecSchema, renderBiology } from './biology.js';
 import { informaticsSpecSchema, renderInformatics } from './informatics.js';
 import { physicsSpecSchema, renderPhysics } from './physics.js';
 import { mechanicsSpecSchema, renderMechanics } from './mechanics.js';
+import { labSpecSchema, renderLab } from './lab/index.js';
 
 // ------------------------------------------------------------
 // المُوزِّع العام
 // ------------------------------------------------------------
-export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays', 'timeline', 'map', 'biology', 'informatics', 'physics'] as const;
+export const FIGURE_GENS = ['circuit', 'geometry', 'chart', 'setup', 'forces', 'number_line', 'function_plot', 'molecule', 'rays', 'timeline', 'map', 'biology', 'informatics', 'physics', 'lab'] as const;
 export type FigureGen = (typeof FIGURE_GENS)[number];
 
 /** مواصفات الشكل حسب المولّد. */
@@ -41,6 +42,10 @@ export function renderFigure(input: FigureInput): string {
     if (input.gen === 'circuit') {
       const parsed = circuitSpecSchema.safeParse(input.spec);
       return parsed.success ? renderCircuit(parsed.data) : '';
+    }
+    if (input.gen === 'lab') {
+      const parsed = labSpecSchema.safeParse(input.spec);
+      return parsed.success ? renderLab(parsed.data) : '';
     }
     if (input.gen === 'geometry') {
       const parsed = geometrySpecSchema.safeParse(input.spec);
