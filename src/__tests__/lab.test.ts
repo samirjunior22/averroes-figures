@@ -66,7 +66,7 @@ describe('lab — الفهرس LAB_CATALOG', () => {
           f.type === 'number' ? (typeof preset === 'number' ? preset : (f.min ?? 1))
           : f.type === 'boolean' ? true
           : f.type === 'select' ? f.options![0]!.value
-          : f.key === 'color' ? '#ff0000' : 'x';
+          : f.type === 'color' ? '#ff0000' : 'x';
         const res = labSpecSchema.safeParse({ kind: entry.kind, ...base, [f.key]: sample });
         expect(res.success, `${entry.kind}.${f.key}`).toBe(true);
       }
@@ -149,3 +149,101 @@ describe('lab — قيم حيّة على الكائن', () => {
     expect(labSpecSchema.safeParse({ kind: 'thermometer', min: 50, max: 10 }).success).toBe(false);
   });
 });
+
+describe('lab — كائنات الرياضيات الجديدة', () => {
+  it('الكسر يعرض البسط والمقام في وضع full وأرقام في numbered وبلا بطاقة في none', () => {
+    const full = renderLab({ kind: 'fraction', num: 3, den: 4, labelsMode: 'full' });
+    expect(full).toContain('3 / 4');
+    const numbered = renderLab({ kind: 'fraction', num: 3, den: 4, labelsMode: 'numbered' });
+    expect(numbered).toContain('>1<');
+    const none = renderLab({ kind: 'fraction', num: 3, den: 4, labelsMode: 'none' });
+    expect(none).not.toContain('3 / 4');
+  });
+
+  it('المجسمات الهندسية تعرض الأبعاد الصحيحة', () => {
+    expect(renderLab({ kind: 'solid', shape: 'cube', a: 7, unit: 'cm' })).toContain('a = 7 cm');
+    expect(renderLab({ kind: 'solid', shape: 'cylinder', r: 4, h: 10, unit: 'cm' })).toContain('r = 4 cm');
+    expect(renderLab({ kind: 'solid', shape: 'cone', r: 3, h: 6, unit: 'cm' })).toContain('h = 6 cm');
+  });
+
+  it('الساعة التناظرية تحسب العقارب وتعرض التوقيت الرقمي', () => {
+    const svg = renderLab({ kind: 'clock', hours: 4, minutes: 30, showDigital: true });
+    expect(svg).toContain('04:30');
+  });
+
+  it('المسطرة والمنقلة والكوس والبركار', () => {
+    expect(renderLab({ kind: 'ruler', length: 20 })).toContain('20');
+    expect(renderLab({ kind: 'protractor', angle: 45 })).toContain('الزاوية: 45°');
+    expect(renderLab({ kind: 'set_square', type: '45' })).toContain('كوس 45°');
+    expect(renderLab({ kind: 'compass_tool', radius: 50 })).toContain('r = 50 mm');
+  });
+
+  it('مجموعات الأعداد تدعم خاصية التركيز focus/highlight', () => {
+    const svgN = renderLab({ kind: 'number_sets', highlight: 'N' });
+    expect(svgN).toContain('المجموعة المبرزة: N');
+    expect(renderLab({ kind: 'place_value', value: 7240 })).toContain('العدد: 7240');
+    expect(renderLab({ kind: 'dice', face: 5 })).toContain('الوجه 5');
+    expect(renderLab({ kind: 'coin', side: 'heads' })).toContain('وجه');
+    expect(renderLab({ kind: 'coin', side: 'tails', value: 200 })).toContain('200');
+    expect(renderLab({ kind: 'abacus', value: 500 })).toContain('القيمة: 500');
+    expect(renderLab({ kind: 'coordinate_point', x: 4, y: -2, label: 'B' })).toContain('B(4, -2)');
+  });
+});
+
+describe('lab — كائنات الجغرافيا الجديدة', () => {
+  it('وردة الرياح والكرة الأرضية وتعاقب الفصول', () => {
+    expect(renderLab({ kind: 'compass_rose', style: 'full' })).toContain('شمال (N)');
+    const eq = renderLab({ kind: 'globe', highlight: 'equator' });
+    expect(eq).toContain('خط الاستواء');
+    const sea = renderLab({ kind: 'seasons', season: 'winter' });
+    expect(sea).toContain('انقلاب شتوي');
+  });
+
+  it('دورة الماء والمقطع التضاريسي والبركان مع التركيز', () => {
+    expect(renderLab({ kind: 'water_cycle', labelsMode: 'full' })).toContain('تبخر');
+    expect(renderLab({ kind: 'water_cycle', labelsMode: 'numbered' })).toContain('>1<');
+    expect(renderLab({ kind: 'relief_profile' })).toContain('مقطع تضاريسي');
+    const volChamber = renderLab({ kind: 'volcano', focus: 'chamber' });
+    expect(volChamber).toContain('غرفة الصهارة');
+    expect(renderLab({ kind: 'rock_layers', layers: 5 })).toContain('طبقات رسوبية');
+  });
+
+  it('أجهزة الأرصاد والمنحنى المناخي ورموز الخريطة ومقياس الرسم', () => {
+    expect(renderLab({ kind: 'weather_instrument', type: 'thermometer', value: 32 })).toContain('32 °C');
+    expect(renderLab({ kind: 'climate_bar', city: 'وهران' })).toContain('وهران');
+    expect(renderLab({ kind: 'map_symbol', symbol: 'capital' })).toContain('عاصمة');
+    expect(renderLab({ kind: 'scale_bar', km: 250 })).toContain('250 km');
+  });
+});
+
+describe('lab — كائنات الإعلام الآلي الجديدة', () => {
+  it('عتاد الحاسوب ورمز المخطط الانسيابي', () => {
+    expect(renderLab({ kind: 'device', type: 'cpu' })).toContain('CPU');
+    expect(renderLab({ kind: 'flow_symbol', shape: 'decision', text: 'n % 2 == 0' })).toContain('n % 2 == 0');
+  });
+
+  it('البوابات المنطقية تحسب الخرج آلياً', () => {
+    // AND
+    expect(renderLab({ kind: 'logic_gate', gate: 'AND', a: 1, b: 1 })).toContain('S = 1');
+    expect(renderLab({ kind: 'logic_gate', gate: 'AND', a: 1, b: 0 })).toContain('S = 0');
+    // OR
+    expect(renderLab({ kind: 'logic_gate', gate: 'OR', a: 1, b: 0 })).toContain('S = 1');
+    expect(renderLab({ kind: 'logic_gate', gate: 'OR', a: 0, b: 0 })).toContain('S = 0');
+    // NOT
+    expect(renderLab({ kind: 'logic_gate', gate: 'NOT', a: 1 })).toContain('S = 0');
+    expect(renderLab({ kind: 'logic_gate', gate: 'NOT', a: 0 })).toContain('S = 1');
+    // XOR
+    expect(renderLab({ kind: 'logic_gate', gate: 'XOR', a: 1, b: 0 })).toContain('S = 1');
+    expect(renderLab({ kind: 'logic_gate', gate: 'XOR', a: 1, b: 1 })).toContain('S = 0');
+  });
+
+  it('السجل الثنائي وصندوق المتغير وأيقونة الملف والشبكة وسكراتش وسلم التخزين', () => {
+    expect(renderLab({ kind: 'binary', value: 13, bits: 8 })).toContain('القيمة العشرية: 13');
+    expect(renderLab({ kind: 'variable_box', name: 'counter', value: '10', varType: 'int' })).toContain('counter');
+    expect(renderLab({ kind: 'file_icon', fileType: 'folder', name: 'المشاريع' })).toContain('المشاريع');
+    expect(renderLab({ kind: 'network', topology: 'star', nodes: 5 })).toContain('طوبولوجيا: star');
+    expect(renderLab({ kind: 'scratch_block', category: 'motion', text: 'تحرك 20 خطوة' })).toContain('تحرك 20 خطوة');
+    expect(renderLab({ kind: 'storage_units', highlight: 'GB' })).toContain('غيغابايت (GB)');
+  });
+});
+

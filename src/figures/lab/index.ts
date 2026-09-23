@@ -25,11 +25,35 @@ import {
   cellSpecSchema, microscopeSpecSchema, petriDishSpecSchema, magnifierSpecSchema, plantSpecSchema, seedSpecSchema, leafSpecSchema,
   renderCell, renderMicroscope, renderPetriDish, renderMagnifier, renderPlant, renderSeed, renderLeaf,
 } from './biologyObjects.js';
+import {
+  fractionSpecSchema, solidSpecSchema, clockSpecSchema, rulerSpecSchema, protractorSpecSchema, setSquareSpecSchema,
+  compassToolSpecSchema, numberSetsSpecSchema, placeValueSpecSchema, diceSpecSchema, coinSpecSchema, abacusSpecSchema, coordinatePointSpecSchema,
+  renderFraction, renderSolid, renderClock, renderRuler, renderProtractor, renderSetSquare, renderCompassTool,
+  renderNumberSets, renderPlaceValue, renderDice, renderCoin, renderAbacus, renderCoordinatePoint,
+} from './mathObjects.js';
+import {
+  compassRoseSpecSchema, globeSpecSchema, seasonsSpecSchema, waterCycleSpecSchema, reliefProfileSpecSchema,
+  volcanoSpecSchema, rockLayersSpecSchema, weatherInstrumentSpecSchema, climateBarSpecSchema, mapSymbolSpecSchema, scaleBarSpecSchema,
+  renderCompassRose, renderGlobe, renderSeasons, renderWaterCycle, renderReliefProfile, renderVolcano,
+  renderRockLayers, renderWeatherInstrument, renderClimateBar, renderMapSymbol, renderScaleBar,
+} from './geographyObjects.js';
+import {
+  deviceSpecSchema, flowSymbolSpecSchema, logicGateSpecSchema, binarySpecSchema, variableBoxSpecSchema,
+  fileIconSpecSchema, networkSpecSchema, scratchBlockSpecSchema, storageUnitsSpecSchema,
+  renderDevice, renderFlowSymbol, renderLogicGate, renderBinary, renderVariableBox,
+  renderFileIcon, renderNetwork, renderScratchBlock, renderStorageUnits,
+} from './informaticsObjects.js';
 
 export const LAB_KINDS = [
   'battery', 'resistor', 'switch', 'lamp', 'meter', 'wire', 'body', 'vector', 'charged_sphere', 'wave',
   'atom', 'element_card', 'formula', 'bond', 'glassware', 'burner', 'heating', 'thermometer', 'balance', 'funnel', 'filter_paper',
   'cell', 'microscope', 'petri_dish', 'magnifier', 'plant', 'seed', 'leaf',
+  // رياضيات
+  'fraction', 'solid', 'clock', 'ruler', 'protractor', 'set_square', 'compass_tool', 'number_sets', 'place_value', 'dice', 'coin', 'abacus', 'coordinate_point',
+  // جغرافيا
+  'compass_rose', 'globe', 'seasons', 'water_cycle', 'relief_profile', 'volcano', 'rock_layers', 'weather_instrument', 'climate_bar', 'map_symbol', 'scale_bar',
+  // إعلام آلي
+  'device', 'flow_symbol', 'logic_gate', 'binary', 'variable_box', 'file_icon', 'network', 'scratch_block', 'storage_units',
 ] as const;
 export const labKindSchema = z.enum(LAB_KINDS);
 export type LabKind = z.infer<typeof labKindSchema>;
@@ -42,6 +66,15 @@ export const labSpecSchema = z.union([
   atomSpecSchema, elementCardSpecSchema, formulaSpecSchema, bondSpecSchema,
   glasswareSpecSchema, burnerSpecSchema, heatingSpecSchema, thermometerSpecSchema, balanceSpecSchema, funnelSpecSchema, filterPaperSpecSchema,
   cellSpecSchema, microscopeSpecSchema, petriDishSpecSchema, magnifierSpecSchema, plantSpecSchema, seedSpecSchema, leafSpecSchema,
+  // رياضيات
+  fractionSpecSchema, solidSpecSchema, clockSpecSchema, rulerSpecSchema, protractorSpecSchema, setSquareSpecSchema,
+  compassToolSpecSchema, numberSetsSpecSchema, placeValueSpecSchema, diceSpecSchema, coinSpecSchema, abacusSpecSchema, coordinatePointSpecSchema,
+  // جغرافيا
+  compassRoseSpecSchema, globeSpecSchema, seasonsSpecSchema, waterCycleSpecSchema, reliefProfileSpecSchema,
+  volcanoSpecSchema, rockLayersSpecSchema, weatherInstrumentSpecSchema, climateBarSpecSchema, mapSymbolSpecSchema, scaleBarSpecSchema,
+  // إعلام آلي
+  deviceSpecSchema, flowSymbolSpecSchema, logicGateSpecSchema, binarySpecSchema, variableBoxSpecSchema,
+  fileIconSpecSchema, networkSpecSchema, scratchBlockSpecSchema, storageUnitsSpecSchema,
 ]);
 export type LabSpec = z.infer<typeof labSpecSchema>;
 
@@ -77,6 +110,42 @@ export function renderLab(spec: LabSpec, opts?: RenderOptions): string {
       case 'plant': return renderPlant(spec, opts);
       case 'seed': return renderSeed(spec, opts);
       case 'leaf': return renderLeaf(spec, opts);
+      // رياضيات
+      case 'fraction': return renderFraction(spec, opts);
+      case 'solid': return renderSolid(spec, opts);
+      case 'clock': return renderClock(spec, opts);
+      case 'ruler': return renderRuler(spec, opts);
+      case 'protractor': return renderProtractor(spec, opts);
+      case 'set_square': return renderSetSquare(spec, opts);
+      case 'compass_tool': return renderCompassTool(spec, opts);
+      case 'number_sets': return renderNumberSets(spec, opts);
+      case 'place_value': return renderPlaceValue(spec, opts);
+      case 'dice': return renderDice(spec, opts);
+      case 'coin': return renderCoin(spec, opts);
+      case 'abacus': return renderAbacus(spec, opts);
+      case 'coordinate_point': return renderCoordinatePoint(spec, opts);
+      // جغرافيا
+      case 'compass_rose': return renderCompassRose(spec, opts);
+      case 'globe': return renderGlobe(spec, opts);
+      case 'seasons': return renderSeasons(spec, opts);
+      case 'water_cycle': return renderWaterCycle(spec, opts);
+      case 'relief_profile': return renderReliefProfile(spec, opts);
+      case 'volcano': return renderVolcano(spec, opts);
+      case 'rock_layers': return renderRockLayers(spec, opts);
+      case 'weather_instrument': return renderWeatherInstrument(spec, opts);
+      case 'climate_bar': return renderClimateBar(spec, opts);
+      case 'map_symbol': return renderMapSymbol(spec, opts);
+      case 'scale_bar': return renderScaleBar(spec, opts);
+      // إعلام آلي
+      case 'device': return renderDevice(spec, opts);
+      case 'flow_symbol': return renderFlowSymbol(spec, opts);
+      case 'logic_gate': return renderLogicGate(spec, opts);
+      case 'binary': return renderBinary(spec, opts);
+      case 'variable_box': return renderVariableBox(spec, opts);
+      case 'file_icon': return renderFileIcon(spec, opts);
+      case 'network': return renderNetwork(spec, opts);
+      case 'scratch_block': return renderScratchBlock(spec, opts);
+      case 'storage_units': return renderStorageUnits(spec, opts);
       default: return '';
     }
   } catch {
